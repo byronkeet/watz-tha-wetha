@@ -10,7 +10,6 @@ interface ChartData {
   }
 
 const RenderChart = ({chartData}: ChartData) => {
-	console.log(chartData);
 	const options = {
 		chart: {
 			id: "watz-tha-weatha",
@@ -25,13 +24,13 @@ const RenderChart = ({chartData}: ChartData) => {
 
 		const series = [
 			{
+				name: "max-temp",
+				data: chartData.temperature_2m_max
+			},
+			{
 			  name: "min-temp",
 			  data: chartData.temperature_2m_min
 			},
-			{
-				name: "max-temp",
-				data: chartData.temperature_2m_max
-			  }
 		  ]
 
 	return (
