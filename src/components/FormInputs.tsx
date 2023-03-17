@@ -15,6 +15,7 @@ export interface Temperatures {
 
 export interface Forecast {
 	daily: Temperatures;
+	error?: string;
 }
 
 interface FormInputsProps {
@@ -48,6 +49,9 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 			body: JSON.stringify({ address: address })
 		})
 		.then(data => {
+			if (data.error) {
+				throw new Error();
+			}
 			if (data.latitude && latRef.current) {
 				latRef.current.value = data.latitude.toString();
 				setLatErr('');
@@ -58,10 +62,11 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 			}
 		})
 		.catch(err => {
-			setCoordsErr('An Error Occured. Please try again.');
+			setCoordsErr('Error. Please try a different address.');
 			console.log(err);
 		})
 		.finally(() => {
+			setGetWeatherErr('');
 			setLoading(false);
 		})
 		
@@ -84,6 +89,9 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 
 		request<Forecast>(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min&timezone=Africa%2FCairo`)
 		.then(data => {
+			if (data.error) {
+				throw new Error();
+			}
 			setTemperatures(data.daily);
 		})
 		.catch(err => {
@@ -140,7 +148,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 					/>
 				</div>
 			</div>
-			<div className="flex flex-col gap-2 w-full">
+			<div className="flex flex-col mb-2 w-full">
 					<div className="error text-[#ff6b6b]">
 						{coordsErr}
 					</div>
@@ -164,7 +172,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 			{ loading ?
 				<Spinner /> :(
 			<div>
-				<div className="flex flex-col gap-2 w-full">
+				<div className="flex flex-col mb-2 w-full">
 					<div className="error text-[#ff6b6b]">
 						{getWeatherErr}
 					</div>

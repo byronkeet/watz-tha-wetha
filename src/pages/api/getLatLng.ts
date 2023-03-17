@@ -23,13 +23,22 @@ export interface Address {
 	country_code: string,
 	continent: string,
 	label: string,
+	error?: string
 }
 interface GetAddressData {
 	data: Address[]
 }
 
 const getLatLng = async (req: NextApiRequest, res: NextApiResponse) => {
-	const { address } = JSON.parse(req.body as string) as GetLatLngBody;
+	let body;
+	if (typeof req.body === 'string') {
+		body = JSON.parse(req.body) as GetLatLngBody;
+	} else {
+		body = req.body as GetLatLngBody;
+	}
+
+	const { address } = body;
+	
 
 	const options = {
 		access_key: process.env.POSITIONSTACK_API_KEY as string,
@@ -40,14 +49,17 @@ const getLatLng = async (req: NextApiRequest, res: NextApiResponse) => {
 
 	try {
 		const response = await fetch(queryUrl);
+		if (!response.ok) {
+			throw new Error('No data found. Try a different address.')
+		}
 		const data = await response.json() as GetAddressData;
-
+		
 		res.status(200);
 		res.json(data.data[0]);
 	} catch (err) {
 		console.error(err);
 		res.status(500);
-		res.json({ err: 'failed'})
+		res.json({ error: 'No data was found. Try a different address' })
 	}
 }
 
