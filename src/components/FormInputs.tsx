@@ -44,7 +44,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 			return;
 		}
 		setCoordsErr('');
-		request<Address>(`http://localhost:3000/api/getLatLng`, {
+		request<Address>(`${process.env.NEXT_PUBLIC_DOMAIN as string}/api/getLatLng`, {
 			method: 'POST',
 			body: JSON.stringify({ address: address })
 		})
