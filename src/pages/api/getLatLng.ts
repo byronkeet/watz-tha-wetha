@@ -4,31 +4,32 @@ interface GetLatLngBody {
 	address: string;
 }
 
+export interface Address {
+	latitude: number,
+	longitude: number,
+	type: string,
+	name: string,
+	number: string,
+	postal_code: string,
+	street: string,
+	confidence: string,
+	region: string,
+	region_code: string,
+	county: string,
+	locality: string,
+	administrative_area: string,
+	neighbourhood: string,
+	country: string,
+	country_code: string,
+	continent: string,
+	label: string,
+}
 interface GetAddressData {
-	data: {
-		latitude: number,
-		longitude: number,
-		type: string,
-		name: string,
-		number: string,
-		postal_code: string,
-		street: string,
-		confidence: string,
-		region: string,
-		region_code: string,
-		county: string,
-		locality: string,
-		administrative_area: string,
-		neighbourhood: string,
-		country: string,
-		country_code: string,
-		continent: string,
-		label: string,
-	}[]
+	data: Address[]
 }
 
 const getLatLng = async (req: NextApiRequest, res: NextApiResponse) => {
-	const { address } = req.body as GetLatLngBody;
+	const { address } = JSON.parse(req.body as string) as GetLatLngBody;
 
 	const options = {
 		access_key: process.env.POSITIONSTACK_API_KEY as string,
@@ -36,8 +37,6 @@ const getLatLng = async (req: NextApiRequest, res: NextApiResponse) => {
 	};
 
 	const queryUrl = 'http://api.positionstack.com/v1/forward?' + new URLSearchParams(options).toString();
-		
-		console.log(queryUrl);
 
 	try {
 		const response = await fetch(queryUrl);
