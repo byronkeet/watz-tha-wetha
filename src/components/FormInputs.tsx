@@ -37,7 +37,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 			setLoading(false);
 			return;
 		}
-		console.log(address)
+
 		request<Address>(`http://localhost:3000/api/getLatLng`, {
 			method: 'POST',
 			body: JSON.stringify({ address: address })
