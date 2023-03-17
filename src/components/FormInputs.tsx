@@ -88,7 +88,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 
 	return (
 		<div className="detail flex flex-col items-center">
-			<div className="coords mb-5">
+			<div className="coords flex mb-5">
 				<input
 					type="text"
 					name="latitude"
@@ -100,7 +100,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 							console.log(error)
 						}
 					}}
-					className="w-64 mr-5 px-4 py-2 rounded-lg" 
+					className="w-full max-w-64 mr-5 px-4 py-2 rounded-lg" 
 				/>
 				<input
 					type="text"
@@ -113,7 +113,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 							alert('Format is incorrect');
 						}
 					}}
-					className="w-64 px-4 py-2 rounded-lg" 
+					className="w-full max-w-64 px-4 py-2 rounded-lg" 
 				/>
 				
 			</div>
@@ -126,7 +126,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 					className=" px-4 py-2 rounded-lg grow"
 				/>
 				<button
-					className="bg-[#ff6b6b] text-white px-4 py-2 rounded-lg basis=1/3"
+					className="bg-[#ff6b6b] text-white text-[14px] sm:text-base px-4 py-2 rounded-lg basis=1/3"
 					onClick={handleGetLatLng}
 				>
 					Get Coords
