@@ -33,11 +33,11 @@ const RenderChart = ({chartData}: ChartData) => {
 
 	const series = [
 		{
-			name: "max-temp",
+			name: "Max Temp",
 			data: chartData.temperature_2m_max
 		},
 		{
-			name: "min-temp",
+			name: "Min Temp",
 			data: chartData.temperature_2m_min
 		},
 	]
