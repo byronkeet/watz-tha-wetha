@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 import Spinner from "./Spinner";
 
@@ -28,16 +28,21 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 	const lngRef = useRef<HTMLInputElement>(null);
 	const addressRef = useRef<HTMLInputElement>(null);
 
+	const [latErr, setLatErr] = useState('') ;
+	const [lngErr, setLngErr] = useState('');
+	const [coordsErr, setCoordsErr] = useState('');
+	const [getWeatherErr, setGetWeatherErr] = useState('');
+
 	const handleGetLatLng = () => {
 		setLoading(true);
 		const address = addressRef.current?.value || '';
 
 		if (!address) {
-			alert('Please enter an address');
+			setCoordsErr('Please enter an address');
 			setLoading(false);
 			return;
 		}
-
+		setCoordsErr('');
 		request<Address>(`http://localhost:3000/api/getLatLng`, {
 			method: 'POST',
 			body: JSON.stringify({ address: address })
@@ -46,9 +51,11 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 			console.log(data)
 			if (data.latitude && latRef.current) {
 				latRef.current.value = data.latitude.toString();
+				setLatErr('');
 			}
 			if (data.longitude && lngRef.current) {
 				lngRef.current.value = data.longitude.toString();
+				setLngErr('');
 			}
 		})
 		.catch(err => {
@@ -68,10 +75,12 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 	
 		const error = validateLatitude(lat) || validateLongitude(lng);
 		if (error) {
-			alert(error);
+			setGetWeatherErr(error);
 			setLoading(false);
 			return;
 		}
+
+		setGetWeatherErr('');
 
 		request<Forecast>(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min&timezone=Africa%2FCairo`)
 		.then(data => {
@@ -88,34 +97,52 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 
 	return (
 		<div className="detail flex flex-col items-center">
-			<div className="coords flex mb-5">
-				<input
-					type="text"
-					name="latitude"
-					placeholder="Latitude"
-					ref={latRef}
-					onBlur={(e) => {
-						const error = validateLatitude(e.target.value);
-						if (error) {
-							console.log(error)
-						}
-					}}
-					className="w-full max-w-64 mr-5 px-4 py-2 rounded-lg" 
-				/>
-				<input
-					type="text"
-					name="longitude"
-					placeholder="Longitude"
-					ref={lngRef}
-					onBlur={(e) => {
-						const error = validateLongitude(e.target.value);
-						if (error) {
-							alert('Format is incorrect');
-						}
-					}}
-					className="w-full max-w-64 px-4 py-2 rounded-lg" 
-				/>
-				
+			<div className="coords flex gap-5 mb-5 justify-end items-end">
+				<div className="flex flex-col gap-2 w-full">
+					<div className="error text-[#ff6b6b]">
+						{latErr}
+					</div>
+					<input
+						type="text"
+						name="latitude"
+						placeholder="Latitude"
+						ref={latRef}
+						onBlur={(e) => {
+							const error = validateLatitude(e.target.value);
+							if (error) {
+								setLatErr(error);
+							} else {
+								setLatErr('');
+							}
+						}}
+						className=" mr-5 px-4 py-2 rounded-lg w-full" 
+					/>
+				</div>
+				<div className="flex flex-col gap-2 w-full">
+					<div className="error text-[#ff6b6b]">
+						{lngErr}
+					</div>
+					<input
+						type="text"
+						name="longitude"
+						placeholder="Longitude"
+						ref={lngRef}
+						onBlur={(e) => {
+							const error = validateLongitude(e.target.value);
+							if (error) {
+								setLngErr(error);
+							} else {
+								setLngErr('');
+							}
+						}}
+						className=" px-4 py-2 rounded-lg w-full" 
+					/>
+				</div>
+			</div>
+			<div className="flex flex-col gap-2 w-full">
+					<div className="error text-[#ff6b6b]">
+						{coordsErr}
+					</div>
 			</div>
 			<div className="address mb-5 w-full flex flex-row justify-between gap-5">
 				<input
@@ -134,14 +161,21 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 			</div>
 			
 			{ loading ?
-				<Spinner /> :
+				<Spinner /> :(
+			<div>
+				<div className="flex flex-col gap-2 w-full">
+					<div className="error text-[#ff6b6b]">
+						{getWeatherErr}
+					</div>
+				</div>
 				<button
 					className="bg-[#ff6b6b] text-white px-4 py-2 rounded-lg w-64"
 					onClick={handleGetWeather}
 				>
 					Get Weather
 				</button>
-			}
+			</div>
+			)}
 		</div>
 	)
 }
