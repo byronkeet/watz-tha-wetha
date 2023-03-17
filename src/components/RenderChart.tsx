@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 import type { Temperatures } from './FormInputs';
+import type { ApexOptions } from 'apexcharts';
 
 interface ChartData {
 	chartData: Temperatures;
@@ -12,7 +13,7 @@ interface ChartData {
 
 const RenderChart = ({chartData}: ChartData) => {
 	const [chartType, setChartType] = useState("line")
-	const options = {
+	const options: ApexOptions = {
 		chart: {
 			id: "watz-tha-weatha",
 			width: '700px'
@@ -55,7 +56,7 @@ const RenderChart = ({chartData}: ChartData) => {
 					<Chart
 					options={options}
 					series={series}
-					type={chartType}
+					type={chartType as 'line' | 'bar'}
 					/>
 				}
 				</div>
