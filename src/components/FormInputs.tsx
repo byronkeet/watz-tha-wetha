@@ -48,7 +48,6 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 			body: JSON.stringify({ address: address })
 		})
 		.then(data => {
-			console.log(data)
 			if (data.latitude && latRef.current) {
 				latRef.current.value = data.latitude.toString();
 				setLatErr('');
@@ -59,6 +58,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 			}
 		})
 		.catch(err => {
+			setCoordsErr('An Error Occured. Please try again.');
 			console.log(err);
 		})
 		.finally(() => {
@@ -87,6 +87,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 			setTemperatures(data.daily);
 		})
 		.catch(err => {
+			setGetWeatherErr('An error occured. Please try again.');
 			console.log(err);
 		})
 		.finally(() => {
