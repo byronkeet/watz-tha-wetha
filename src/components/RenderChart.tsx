@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-import type { Temperatures } from '../pages/index';
+import type { Temperatures } from './FormInputs';
 
 interface ChartData {
 	chartData: Temperatures;

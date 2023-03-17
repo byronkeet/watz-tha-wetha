@@ -1,115 +1,16 @@
 import { type NextPage } from "next";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Head from "next/head"
 
-import Spinner from "../components/Spinner";
+import FormInputs from "../components/FormInputs";
 import RenderChart from "../components/RenderChart";
 
-import type { Address } from "./api/getLatLng";
-
-const LATITUDE_PATTERN = /^-?([1-8]?\d(\.\d{1,6})?|90(\.0{1,6})?)$/;
-const LONGITUDE_PATTERN = /^-?((1[0-7]|[1-9])?\d(\.\d{1,6})?|180(\.0{1,6})?)$/;
-
-const validateLatitude = (value: string) => {
-	if (!LATITUDE_PATTERN.test(value)) {
-		return 'Invalid latitude value';
-	}
-}
-
-const validateLongitude = (value: string) => {
-	if (!LONGITUDE_PATTERN.test(value)) {
-		return 'Invalid longitude value';
-	}
-}
-
-export interface Temperatures {
-	temperature_2m_max: number[];
-	temperature_2m_min: number[];
-	time: string[];
-}
-
-export interface Forecast {
-	daily: Temperatures;
-}
-
-function request<TResponse>(
-	url: string,
-	config: RequestInit = {}
-  ): Promise<TResponse> {
-	return fetch(url, config)
-	  .then((response) => response.json())
-	  .then((data) => data as TResponse)
-	  .catch((error) => {
-		console.error(error);
-		throw error;
-	  });
-}
+import type { Temperatures } from "../components/FormInputs";
 
 const Home: NextPage = () => {
-	const latRef = useRef<HTMLInputElement>(null);
-	const lngRef = useRef<HTMLInputElement>(null);
-	const addressRef = useRef<HTMLInputElement>(null);
-
+	
 	const [loading, setLoading] = useState(false);
 	const [temperatures, setTemperatures] = useState<Temperatures>();
-
-	const handleGetLatLng = () => {
-		setLoading(true);
-		const address = addressRef.current?.value || '';
-
-		if (!address) {
-			alert('Please enter an address');
-			setLoading(false);
-			return;
-		}
-		console.log(address)
-		request<Address>(`http://localhost:3000/api/getLatLng`, {
-			method: 'POST',
-			body: JSON.stringify({ address: address })
-		})
-		.then(data => {
-			console.log(data)
-			if (data.latitude && latRef.current) {
-				latRef.current.value = data.latitude.toString();
-			}
-			if (data.longitude && lngRef.current) {
-				lngRef.current.value = data.longitude.toString();
-			}
-		})
-		.catch(err => {
-			console.log(err);
-		})
-		.finally(() => {
-			setLoading(false);
-		})
-		
-
-	}
-
-	const handleGetWeather = () => {
-		setLoading(true);
-		const lat = latRef.current?.value || '';
-		const lng = lngRef.current?.value || '';
-	
-		const error = validateLatitude(lat) || validateLongitude(lng);
-		if (error) {
-			alert(error);
-			setLoading(false);
-			return;
-		}
-
-		request<Forecast>(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min&timezone=Africa%2FCairo`)
-		.then(data => {
-			setTemperatures(data.daily);
-		})
-		.catch(err => {
-			console.log(err);
-		})
-		.finally(() => {
-			setLoading(false);
-		})
-		
-	}
 
 	return (
 		<>
@@ -121,62 +22,11 @@ const Home: NextPage = () => {
 		<main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
 			<div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
 				<h1 className="text-4xl font-bold text-white">Watz Tha Wetha</h1>
-				<div className="detail flex flex-col items-center">
-					<div className="coords mb-5">
-						<input
-							type="text"
-							name="latitude"
-							placeholder="Latitude"
-							ref={latRef}
-							onBlur={(e) => {
-								const error = validateLatitude(e.target.value);
-								if (error) {
-									console.log(error)
-								}
-							}}
-							className="w-64 mr-5 px-4 py-2 rounded-lg" 
-						/>
-						<input
-							type="text"
-							name="longitude"
-							placeholder="Longitude"
-							ref={lngRef}
-							onBlur={(e) => {
-								const error = validateLongitude(e.target.value);
-								if (error) {
-									alert('Format is incorrect');
-								}
-							}}
-							className="w-64 px-4 py-2 rounded-lg" 
-						/>
-						
-					</div>
-					<div className="address mb-5 w-full flex flex-row justify-between gap-5">
-						<input
-							type="text"
-							name="address"
-							placeholder="Address"
-							ref={addressRef}
-							className=" px-4 py-2 rounded-lg grow"
-						/>
-						<button
-							className="bg-[#ff6b6b] text-white px-4 py-2 rounded-lg basis=1/3"
-							onClick={handleGetLatLng}
-						>
-							Get Coords
-						</button>
-					</div>
-					
-					{ loading ?
-						<Spinner /> :
-						<button
-							className="bg-[#ff6b6b] text-white px-4 py-2 rounded-lg w-64"
-							onClick={handleGetWeather}
-						>
-							Get Weather
-						</button>
-					}
-				</div>
+				<FormInputs
+					loading={loading}
+					setLoading={setLoading}
+					setTemperatures={setTemperatures}
+				/>
 				{ temperatures && <RenderChart chartData={temperatures} />}
 			</div>
 		</main>
