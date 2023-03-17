@@ -34,7 +34,7 @@ const RenderChart = ({chartData}: ChartData) => {
 		  ]
 
 	return (
-		<div className="app w-1/2">
+		<div className="app lg:w-2/3 w-full">
 		  <div className="row">
 			<div className="mixed-chart">
 			{(typeof window !== 'undefined') &&
