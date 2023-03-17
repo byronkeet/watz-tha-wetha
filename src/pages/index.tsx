@@ -1,8 +1,9 @@
 import { type NextPage } from "next";
 import { useState, useRef } from "react";
-import Head from "next/head";
+import Head from "next/head"
 
 import Spinner from "../components/Spinner";
+import RenderChart from "../components/RenderChart";
 
 const LATITUDE_PATTERN = /^-?([1-8]?\d(\.\d{1,6})?|90(\.0{1,6})?)$/;
 const LONGITUDE_PATTERN = /^-?((1[0-7]|[1-9])?\d(\.\d{1,6})?|180(\.0{1,6})?)$/;
@@ -64,7 +65,6 @@ const Home: NextPage = () => {
 
 		request<Forecast>(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min&timezone=Africa%2FCairo`)
 		.then(data => {
-			console.log(data);
 			setTemperatures(data.daily);
 		})
 		.catch(err => {
@@ -125,15 +125,7 @@ const Home: NextPage = () => {
 						</button>
 					}
 				</div>
-				{ temperatures && (
-					<ul>
-					{Object.keys(temperatures).map((key) => (
-					  <li key={key} className='text-white'>
-						<strong>{key}:</strong> {temperatures[key]}
-					  </li>
-					))}
-				  </ul>
-				)}
+				{ temperatures && <RenderChart chartData={temperatures} />}
 			</div>
 		</main>
 		</>
