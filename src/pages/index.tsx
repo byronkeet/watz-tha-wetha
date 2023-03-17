@@ -5,6 +5,8 @@ import Head from "next/head"
 import Spinner from "../components/Spinner";
 import RenderChart from "../components/RenderChart";
 
+import type { Address } from "./api/getLatLng";
+
 const LATITUDE_PATTERN = /^-?([1-8]?\d(\.\d{1,6})?|90(\.0{1,6})?)$/;
 const LONGITUDE_PATTERN = /^-?((1[0-7]|[1-9])?\d(\.\d{1,6})?|180(\.0{1,6})?)$/;
 
@@ -30,7 +32,6 @@ export interface Forecast {
 	daily: Temperatures;
 }
 
-
 function request<TResponse>(
 	url: string,
 	config: RequestInit = {}
@@ -47,9 +48,43 @@ function request<TResponse>(
 const Home: NextPage = () => {
 	const latRef = useRef<HTMLInputElement>(null);
 	const lngRef = useRef<HTMLInputElement>(null);
+	const addressRef = useRef<HTMLInputElement>(null);
 
 	const [loading, setLoading] = useState(false);
 	const [temperatures, setTemperatures] = useState<Temperatures>();
+
+	const handleGetLatLng = () => {
+		setLoading(true);
+		const address = addressRef.current?.value || '';
+
+		if (!address) {
+			alert('Please enter an address');
+			setLoading(false);
+			return;
+		}
+		console.log(address)
+		request<Address>(`http://localhost:3000/api/getLatLng`, {
+			method: 'POST',
+			body: JSON.stringify({ address: address })
+		})
+		.then(data => {
+			console.log(data)
+			if (data.latitude && latRef.current) {
+				latRef.current.value = data.latitude.toString();
+			}
+			if (data.longitude && lngRef.current) {
+				lngRef.current.value = data.longitude.toString();
+			}
+		})
+		.catch(err => {
+			console.log(err);
+		})
+		.finally(() => {
+			setLoading(false);
+		})
+		
+
+	}
 
 	const handleGetWeather = () => {
 		setLoading(true);
@@ -114,7 +149,24 @@ const Home: NextPage = () => {
 							}}
 							className="w-64 px-4 py-2 rounded-lg" 
 						/>
+						
 					</div>
+					<div className="address mb-5 w-full flex flex-row justify-between gap-5">
+						<input
+							type="text"
+							name="address"
+							placeholder="Address"
+							ref={addressRef}
+							className=" px-4 py-2 rounded-lg grow"
+						/>
+						<button
+							className="bg-[#ff6b6b] text-white px-4 py-2 rounded-lg basis=1/3"
+							onClick={handleGetLatLng}
+						>
+							Get Coords
+						</button>
+					</div>
+					
 					{ loading ?
 						<Spinner /> :
 						<button
