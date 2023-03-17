@@ -6,6 +6,7 @@ import FormInputs from "../components/FormInputs";
 import RenderChart from "../components/RenderChart";
 
 import type { Temperatures } from "../components/FormInputs";
+import Image from "next/image";
 
 const Home: NextPage = () => {
 	
@@ -27,7 +28,7 @@ const Home: NextPage = () => {
 					setLoading={setLoading}
 					setTemperatures={setTemperatures}
 				/>
-				{ temperatures && <RenderChart chartData={temperatures} />}
+				{ temperatures ? <RenderChart chartData={temperatures} /> : <Image src="/weather.svg" alt="weather" width="256" height="256" className="w-64" />}
 			</div>
 		</main>
 		</>
