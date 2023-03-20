@@ -164,6 +164,7 @@ const FormInputs = ({setLoading, setTemperatures, loading}: FormInputsProps) => 
 				<button
 					className="bg-[#ff6b6b] text-white text-[14px] sm:text-base px-4 py-2 rounded-lg basis=1/3"
 					onClick={handleGetLatLng}
+					disabled={loading}
 				>
 					Get Coords
 				</button>
